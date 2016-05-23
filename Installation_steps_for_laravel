@@ -1,0 +1,26 @@
+Installation steps for laravel
+
+1.Install LAMP
+check if 
+    php >=5.6
+     use cmmd : php -v
+
+    OpenSSL php extension
+        php -r "echo OPENSSL_VERSION_NUMBER;"
+
+        PHP OpenSSL is provided as a DLL file called php_openssl.dll. PHP-Openssl is used for generation and verification of signatures and for sealing (encrypting) and opening (decrypting) data. OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library. 
+
+        
+    PDO PHP Extension
+        Using command line, for PDO:
+        php -m|grep -i pdo
+
+        For PDO with MySQL support:
+        php -m|grep -i pdo_mysql
+
+        To install php mysql support, search for the package name (Ubuntu):
+        apt-cache search php7*|grep mysql
+
+        And install it if not already did (Ubuntu):
+        sudo apt-get install php-mysql
+

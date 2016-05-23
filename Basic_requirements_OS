@@ -22,16 +22,21 @@ sudo apt-get install filezilla
 
 inorder to use filezilla simply type filezilla in the terminal it will open up. The left side is ur local dir and right side is the hosted dir
 
-login details for ==>
-repo == webdev.tifr.res.in
-sayali == login
-sayali == pass
-22 == port
-
-
-
 php :
 sudo apt-get install php
+run interactive php from command line install
+sudo apt-get install php-cli
+
+to start cli app --
+php -a
+open file
+php filename.php
+
+
+
+
+
+
 
 xampp :
 installation ---
