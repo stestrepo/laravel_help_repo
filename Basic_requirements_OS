@@ -1,0 +1,46 @@
+installed files so far:
+
+
+ubuntu- 16.04
+windows10
+
+---
+ubuntu ==>
+
+sublime text 3 :
+sudo add-apt-repository ppa:webupd8team/sublime-text-3
+sudo add-apt-repository ppa:webupd8team/sublime^Cext-3
+sudo apt-get update
+sudo apt-get install sublime-text-installer
+
+
+
+
+
+filezilla:
+sudo apt-get install filezilla
+
+inorder to use filezilla simply type filezilla in the terminal it will open up. The left side is ur local dir and right side is the hosted dir
+
+login details for ==>
+repo == webdev.tifr.res.in
+sayali == login
+sayali == pass
+22 == port
+
+
+
+php :
+sudo apt-get install php
+
+xampp :
+installation ---
+
+sudo subl ~/.local/share/applications/xampp-control-panel.desktop
+in fourth line :  "sudo -i"  was changed to   " gksudo "
+sudo apt-get install gk-su
+
+inorder to run xampp application : // type this line in the terminal it will open up the application window
+sudo /opt/lampp/manager-linux-x64.run
+
+
