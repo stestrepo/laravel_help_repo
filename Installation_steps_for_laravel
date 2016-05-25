@@ -24,3 +24,35 @@ check if
         And install it if not already did (Ubuntu):
         sudo apt-get install php-mysql
 
+------------------
+----------------------
+
+
+
+reinstall ------------- 2.0 ------------------------->>
+
+1. installed :
+sudo apt-get update
+sudo apt-get install gdebi
+sudo apt-get install git
+sudo apt-get install filezilla
+
+sudo add-apt-repository ppa:webupd8team/sublime-text-3
+sudo apt-get update
+sudo apt-get install sublime-text-installer
+
+virtualbox
+https://www.virtualbox.org/wiki/Linux_Downloads
+
+vagrant
+https://www.vagrantup.com/downloads.html
+
+sudo apt-get install php7.0
+
+
+
+
+
+
+
+
