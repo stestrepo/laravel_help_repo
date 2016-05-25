@@ -41,6 +41,9 @@ sudo add-apt-repository ppa:webupd8team/sublime-text-3
 sudo apt-get update
 sudo apt-get install sublime-text-installer
 
+download the composer as mentioned in their website.
+now you can move/copy the composer.phar file to the /usr/local/bin dir so that composer is accessable from anywhere
+
 virtualbox
 https://www.virtualbox.org/wiki/Linux_Downloads
 
@@ -49,9 +52,27 @@ https://www.vagrantup.com/downloads.html
 
 sudo apt-get install php7.0
 
+in terminal after everything is installed:
+vagrant box add laravel/homestead
+
+follow up by selecting one of the options- I have selected virtualbox
 
 
 
+
+
+
+now inorder to install laravel :
+composer global require "laravel/installer"
+
+run it only once and later only for updating it
+Make sure to place the "~/.composer/vendor/bin" directory (or the equivalent directory for your OS) in your PATH so the laravel executable can be located by your system.
+
+sudo apt-get install php7.0-zip
+since my php zip extension was missing.
+
+
+laravel new myproject
 
 
 
