@@ -24,6 +24,27 @@ check if
         And install it if not already did (Ubuntu):
         sudo apt-get install php-mysql
 
+
+    Mbstring PHP Extension
+        php -m
+        sudo apt install php-mbstring
+
+    Tokenizer PHP Extension
+     its present
+
+
+
+
+now incase composer and laravel dnt go together cz composer is upgraded then, following commands help:
+sudo composer self-update
+
+sudo composer clear-cahce
+
+sudo composer config -g secure-http false
+
+sudo composer update --no-scripts
+
+
 ------------------
 ----------------------
 
@@ -71,8 +92,12 @@ Make sure to place the "~/.composer/vendor/bin" directory (or the equivalent dir
 sudo apt-get install php7.0-zip
 since my php zip extension was missing.
 
+sudo apt-get install php-xml
+since php dom extension was missing
 
-laravel new myproject
+
+laravel new project18 
+it would create a new laravel empty project by name "project18"
 
 
 
