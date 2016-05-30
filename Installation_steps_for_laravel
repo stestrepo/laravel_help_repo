@@ -96,9 +96,42 @@ sudo apt-get install php-xml
 since php dom extension was missing
 
 
+homestead: follow the steps written in the doc
+ cd ~/.homestead
+ subl Homestead.yaml
+provider: virtualbox <-- in the file at end 
+
+
+
+
 laravel new project18 
 it would create a new laravel empty project by name "project18"
 
 
+https://laracasts.com/lessons/say-hello-to-laravel-homestead-two
+
+
+
+
+----------------
+----------------------------
+---------------------------------------
+
+Installing laravel on the server
+
+check for os version running --
+lsb_release -a
+Red Hat Enterprise Linux Server release 6.7
+
+check:  php -v : 5.6
+
+folder create/delete
+mkdir folder_name
+rm -r -f folder_name
+
+rm -- remove
+-r -- remove subfolders/dependencies
+-f -- remove by force 
+folder_name -- path of the folder from where it has to be removed
 
 
