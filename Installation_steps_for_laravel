@@ -135,3 +135,24 @@ rm -- remove
 folder_name -- path of the folder from where it has to be removed
 
 
+For the server since it acts like a virtual m/c , it has its instances, we would not make use of laravel homestead vm instead we would directly install laravel framework on the server m/c
+
+composer global require "laravel/installer"
+
+or 
+
+composer create-project laravel/laravel people_finder 5.2
+
+
+
+
+composer create-project laravel/laravel your-project-name 4.0.*
+Change "dev" to "stable" in composer.json
+
+Then run
+
+    composer self-update
+
+After that, run this command
+
+    composer update --no-scripts
