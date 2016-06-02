@@ -45,6 +45,12 @@ sudo composer config -g secure-http false
 sudo composer update --no-scripts
 
 
+
+git remote -v
+helps to check if the remote is connected to the local repo
+The repository you're trying to fetch must exist on GitHub, and the URL is case-sensitive.
+You can find the URL of the local repository by opening the command line and typing git remote -v:
+
 ------------------
 ----------------------
 
@@ -125,6 +131,14 @@ Red Hat Enterprise Linux Server release 6.7
 
 check:  php -v : 5.6
 
+apache version running
+rpm -q httpd
+httpd-2.2.15-45.el6.x86_64
+
+mysql -V
+5.5.49
+
+
 folder create/delete
 mkdir folder_name
 rm -r -f folder_name
@@ -136,6 +150,31 @@ folder_name -- path of the folder from where it has to be removed
 
 
 For the server since it acts like a virtual m/c , it has its instances, we would not make use of laravel homestead vm instead we would directly install laravel framework on the server m/c
+
+---------------
+NOTE: login into opr, go for root access 
+
+install git on server
+
+rpm -q qit -- check if its installed else
+
+yum install git
+
+follow it up by going in home/sayali folder
+
+epel-release
+ref -- http://tecadmin.net/install-laravel-framework-on-centos/
+
+commmands 
+
+wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+rpm -ivh epel-release-6-8.noarch.rpm
+
+inorder to verify epel repo
+yum repolist
+
+
+
 
 composer global require "laravel/installer"
 
@@ -156,3 +195,56 @@ Then run
 After that, run this command
 
     composer update --no-scripts
+
+
+
+
+
+
+
+
+
+
+
+
+
+laravels artisian : it's cli 
+inorder to run the laravel server locally use:
+php artisan serve
+
+incase the artisan is listening at the regular port 8000 then use the below command:
+php artisan serve --port="8001"
+
+
+
+
+
+
+http://linoxide.com/linux-how-to/install-laravel-php-centos-7-ubuntu-15-04/
+http://tecadmin.net/install-laravel-framework-on-centos/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------
+------------------------------
+
+2nd june
+
+logged in from user sayali project build up :
+
+composer create-project laravel/laravel people_find
+
+fetches up a new laravel project
+
+
