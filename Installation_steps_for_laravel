@@ -85,6 +85,7 @@ vagrant box add laravel/homestead
 follow up by selecting one of the options- I have selected virtualbox
 
 
+Since the whole server has vmware installed there is no need for it to be installed now but working in v/m would help us move the entire instance of work from one mc to another 
 
 
 
@@ -102,6 +103,17 @@ sudo apt-get install php-xml
 since php dom extension was missing
 
 
+now install lamp server-
+sudo apt-get install tasksel
+sudo taskel install lamp-server
+
+sudo apt-get install phpmyadmin
+
+
+
+
+
+
 homestead: follow the steps written in the doc
  cd ~/.homestead
  subl Homestead.yaml
@@ -117,6 +129,12 @@ it would create a new laravel empty project by name "project18"
 https://laracasts.com/lessons/say-hello-to-laravel-homestead-two
 
 
+
+
+
+now there are some css dependencies that need to be installed for the css and script packages of the laravel-elixer
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 
 ----------------
@@ -150,6 +168,11 @@ folder_name -- path of the folder from where it has to be removed
 
 
 For the server since it acts like a virtual m/c , it has its instances, we would not make use of laravel homestead vm instead we would directly install laravel framework on the server m/c
+
+
+for installing node/npm packages :
+ install node it comes with the npm package support 
+
 
 ---------------
 NOTE: login into opr, go for root access 
@@ -225,8 +248,11 @@ http://tecadmin.net/install-laravel-framework-on-centos/
 
 
 
+-----------------------
+------------------------------------------
 
-
+environment path should be set properly in bashrc,
+it refrence from .profilerc
 
 
 
@@ -248,3 +274,155 @@ composer create-project laravel/laravel people_find
 fetches up a new laravel project
 
 
+
+
+
+
+
+make a layout file/master page (basic boiler plate)
+
+
+
+inorder to prevent the redundancy :
+or store the assests you want to use again after some time
+
+create a new css and js folder in the public directory and store specific siles in them with href="/css/style.css" 
+
+
+The only reason public is not written is, since we already have a server running with public directory as a document root 
+
+eg. in Public directory : css and js folder is created 
+
+view would be stored in resources -- create multiple folders/layout/widgets within it
+
+preprocessor sass,less,style list ,concat js files/minify js files and that is the only thing you want to serve to production.
+
+
+----------------------------------------------------------
+Asset management with laravel elixir
+
+
+package.json is the no js version of composer.json -- it uses npm and node json to install the dependies we need.
+basic requirement is to install the nodejs 
+
+for node.js :  install node it comes with the npm package support 
+if not we make use of npm install.
+
+inorder to check for any dependencies that would be present
+all the dependencies installed would be placed in the node_modeules directory.
+
+laravel uses a tool called laravel elixir. With help of laravel, all the mixtures can be properly stored.
+this gulpfile comes with laravel installer but the dependencies need to be installed 
+
+checkout gulpfile.js file--
+its present outside, under the main directory
+
+gulp is good bt every time a good amount of boiler plate needs to be added.
+it can also be used for sass styling
+eg. elixir(function(mix) {
+    mix.sass('app.scss');
+});
+elixir(function(mix) {
+    mix.less('app.less');
+});
+where exactly is the file located? its in the resources/assests/scss
+
+
+If you want gulp-cli available on the command line, you need to install it globally.
+sudo npm install --global gulp-cli
+since root access would be required.
+
+now type "gulp" in the cli,
+this would give a minified version of apps.css or any other css file that has been used. 
+also if less is used then the minified version of apps.less would be made.
+
+if you want to use js files then use "browserify" 
+
+copy/execute a file then change it in the gulp file
+
+
+usually scss is used, it takes care of most of the prefixed files,minify them 
+
+
+cli -> gulp
+
+it will process the file and save it to a build/css/ directory
+
+cli -> gulp watch 
+inorder to keep track of all the changes done in gulp file.
+also each time a change is done its compiled and notification for the same would be shown on the desktop, you can also check for the same by checking the hashed number of the file,after each compilation it would change.
+
+-----------------------------
+----------------------------------------------
+
+the user has many cards--
+
+limit those cards
+
+
+php artisian make:controller CardsController -> this would make a conrtroller file 
+
+for items which belong to a specific groupset then they should be clubbed in one folder
+
+items for option : get,put,update,delete,
+
+to store a data in a card -- post - the card data
+put request to update card info
+delete request follow basic principles of rest
+return ("cards") -- incase you have multiple resources, put them in separate folders.
+
+the db used -- mysql 
+
+
+
+
+
+
+2ways : 1. laravels query builder
+    2.laravels ORM called elequent
+
+project --> config--> here all the config for every thing right from views, cache mechanism to database.
+
+
+
+
+use database migrations incase multiple pple are working on the same project.
+the are made as the project changes occur.
+
+eg. a table has to be created then,
+php artisan make:migration create_cards_table --create=cards
+
+
+incase 
+
+
+
+
+
+-------------------------------
+---------------------------------------------------
+
+laravel's ORM
+
+php artisan make:model
+
+
+
+
+http://stackoverflow.com/questions/30239194/laravel-mysql-database-connection
+
+http://stackoverflow.com/questions/18059778/laravel-mysql-database-migrateinstall-error
+
+http://stackoverflow.com/questions/10629917/mysql-database-setup-issue
+
+http://stackoverflow.com/questions/2202888/mysql-database-setup-help
+
+http://stackoverflow.com/questions/23437163/mysql-user-database-setup
+
+http://stackoverflow.com/questions/31323633/laravel-mysql-database-error-unknown-database
+
+---------------------------
+
+https://docs.phpmyadmin.net/en/latest/setup.html
+https://launchpad.net/~nijel/+archive/ubuntu/phpmyadmin
+https://help.launchpad.net/Packaging/PPA
