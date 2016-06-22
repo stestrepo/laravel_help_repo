@@ -1,0 +1,1849 @@
+ Laravel 5.1: Names for route groups
+
+A small new feature in Laravel 5.1 – just for those who want to group their routes a little more properly. Now we can add a prefix not only to routes, but to the route groups as well.
+The old way
+
+Let’s imagine we have a route group like this:
+
+Route::group(['prefix' => 'user'], function()
+{
+    Route::get('/', function()
+    {
+    	return view('user/main');
+    });
+
+    Route::get('profile', function()
+    {
+    	return view('user/profile');
+    });
+
+});
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+	
+Route::group(['prefix' => 'user'], function()
+{
+    Route::get('/', function()
+    {
+    	return view('user/main');
+    });
+ 
+    Route::get('profile', function()
+    {
+    	return view('user/profile');
+    });
+ 
+});
+
+Next step – we want to add names to the separate routes, to use them by names everywhere in the code:
+
+Route::group(['prefix' => 'user'], function()
+{
+    Route::get('/', ['as' => 'user.main', function()
+    {
+    	return view('user/main');
+    }]);
+
+    Route::get('profile', ['as' => 'user.profile', function()
+    {
+    	return view('user/profile');
+    }]);
+
+});
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+	
+Route::group(['prefix' => 'user'], function()
+{
+    Route::get('/', ['as' => 'user.main', function()
+    {
+    	return view('user/main');
+    }]);
+ 
+    Route::get('profile', ['as' => 'user.profile', function()
+    {
+    	return view('user/profile');
+    }]);
+ 
+});
+
+So, at this point we have two named routes – user.main and user.profile, which we can use like this:
+
+{{ link_to_route('user.main', 'User main') }}
+{{ link_to_route('user.profile', 'User profile') }}
+1
+2
+	
+{{ link_to_route('user.main', 'User main') }}
+{{ link_to_route('user.profile', 'User profile') }}
+
+New in Laravel 5.1 – named groups
+
+Now, to the point – a new feature of Laravel 5.1 (not 5.0): we can assign that user. prefix to the whole group, with the same “as” parameter. Like this:
+
+Route::group(['prefix' => 'user', 'as' => 'user.'], function()
+{
+    Route::get('/', ['as' => 'main', function()
+    {
+    	return view('user/main');
+    }]);
+
+    Route::get('profile', ['as' => 'profile', function()
+    {
+    	return view('user/profile');
+    }]);
+
+});
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+	
+Route::group(['prefix' => 'user', 'as' => 'user.'], function()
+{
+    Route::get('/', ['as' => 'main', function()
+    {
+    	return view('user/main');
+    }]);
+ 
+    Route::get('profile', ['as' => 'profile', function()
+    {
+    	return view('user/profile');
+    }]);
+ 
+});
+
+The usage from views or from other files doesn’t change – it’s just more convenient grouping of routes in routes.php file.
+
+Notice another detail – we are not limited to dots at the end of the group name. We can put whatever symbol we want there: colon, comma, dash etc. Like this:
+
+Route::group(['prefix' => 'user', 'as' => 'user-'], function()
+{
+    Route::get('/', ['as' => 'main', function()
+    {
+    	return view('user/main');
+    }]);
+
+});
+1
+2
+3
+4
+5
+6
+7
+8
+	
+Route::group(['prefix' => 'user', 'as' => 'user-'], function()
+{
+    Route::get('/', ['as' => 'main', function()
+    {
+    	return view('user/main');
+    }]);
+ 
+});
+
+And then we will use this route like this:
+
+{{ link_to_route('user-main', 'User main') }}
+1
+	
+{{ link_to_route('user-main', 'User main') }}
+
+================================================================================================
+
+
+
+ How to check route parameters with regular expressions
+
+I’m pretty sure that majority of you haven’t read ALL official Laravel documentation – you work only with functions you actually need and know, right? So I like to dig up some less known or “hidden” features which are new to many people. So today one of those “Did you know?” cases.
+
+Routing mechanism allows us to specify parameters in URL, like this:
+
+Route::get('user/{name}', function ($name) { // ...
+1
+    
+Route::get('user/{name}', function ($name) { // ...
+
+Or with Controller:
+Route::get('user/{id}', 'UserController@showProfile');
+1
+    
+Route::get('user/{id}', 'UserController@showProfile');
+
+But how do we make sure that the parameter is, for example, a number? In the second example – we need the user ID to be integer, right?
+
+Of course, we will make validation in Controller or in Middleware. But we can easily make it even before then – in the same routes.php file, like this:
+
+Route::get('user/{id}', 'UserController@showProfile')
+->where('id', '[0-9]+');
+1
+2
+    
+Route::get('user/{id}', 'UserController@showProfile')
+->where('id', '[0-9]+');
+
+Basically, Route commands except additional function where(field, expression) where you can check whatever you want with regular expressions.
+
+Same can work for more than one parameter – just specify an array in where() function:
+
+Route::get('user/{id}/{name}', function ($id, $name) {
+    //
+})
+->where(['id' => '[0-9]+', 'name' => '[a-z]+']);
+1
+2
+3
+4
+    
+Route::get('user/{id}/{name}', function ($id, $name) {
+    //
+})
+->where(['id' => '[0-9]+', 'name' => '[a-z]+']);
+
+If the validation fails, route would not be found and a visitor would get 404 error, or whatever you specify on handling “Route not found” case.
+
+The same short explanation can be found in 
+https://laravel.com/docs/5.1/routing#parameters-regular-expression-constraints
+
+===========================================================================================================================
+
+
+ How to rename users DB table in default Laravel Auth
+
+Laravel framework comes with built-in Auth mechanism for logging-in and registering users. As a part of that we have starting migration files, one of them is creating a main Auth DB table called users. But what if we want to change that table name, and use Users for some other purpose? It’s actually pretty easy to do.
+
+Database table name for Auth is configurable. Not perfectly easy, but there are four places you need to change:
+
+1. Migration file
+
+After installing Laravel, you have this migration file 2014_10_12_000000_create_users_table.php:
+
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password', 60);
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::drop('users');
+    }
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+    
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password', 60);
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+ 
+    public function down()
+    {
+        Schema::drop('users');
+    }
+
+So here you can change your table name to anywhere you want – as long as you do it in both up() and down() functions, like this:
+
+    public function up()
+    {
+        Schema::create('admins', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password', 60);
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::drop('admins');
+    }
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+    
+    public function up()
+    {
+        Schema::create('admins', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password', 60);
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+ 
+    public function down()
+    {
+        Schema::drop('admins');
+    }
+
+Then you run artisan migrate command and see the same text mentioning users migration:
+
+Migration table created successfully.
+Migrated: 2014_10_12_000000_create_users_table
+Migrated: 2014_10_12_100000_create_password_resets_table
+1
+2
+3
+    
+Migration table created successfully.
+Migrated: 2014_10_12_000000_create_users_table
+Migrated: 2014_10_12_100000_create_password_resets_table
+
+But under the hood you know it will be admins. Or, in fact, you can rename files as well for the consistency.
+
+2. Change the table in app/User.php
+
+In the main Eloquent model, which takes care of users, we can specify another table:
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+1
+2
+3
+4
+5
+6
+    
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+Change ‘users’ to ‘admins’, that’s it.
+
+3. Change the table in config/auth.php
+
+Same small change in the config – from ‘users’ to ‘admins’:
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Table
+    |--------------------------------------------------------------------------
+    |
+    | When using the "Database" authentication driver, we need to know which
+    | table should be used to retrieve your users. We have chosen a basic
+    | default value but you may easily change it to any table you like.
+    |
+    */
+
+    'table' => 'users',
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Table
+    |--------------------------------------------------------------------------
+    |
+    | When using the "Database" authentication driver, we need to know which
+    | table should be used to retrieve your users. We have chosen a basic
+    | default value but you may easily change it to any table you like.
+    |
+    */
+ 
+    'table' => 'users',
+
+4. Validation rule – unique email check
+
+In default app/Http/Controllers/Auth/AuthController.php there are validation rules listed. One of them states that email has to be unique – so we need to change the table it is checking:
+
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|confirmed|min:6',
+        ]);
+    }
+1
+2
+3
+4
+5
+6
+7
+8
+    
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|confirmed|min:6',
+        ]);
+    }
+
+Change the part ‘unique:users’ to ‘unique:admins’.
+
+* * * * *
+
+And that’s it – from now, whatever Auth::xxxxx() function you call – it will work with your admins table.
+
+=============================================================================================================================
+
+
+Route Group within a Group
+
+A real-life scenario: you want to have URLs like account/*** under the same Route group with a prefix, but some of them should be also restricted with Auth Middleware. No problem – you can create a Group within a Group!
+
+So, for example, you want to have /account/register and /account/login without Auth Middleware (as in, available without login), but /account/edit needs to be available only to logged-in users.
+
+The code in app/Http/routes.php would look something like this:
+
+Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
+
+    Route::get('login', ['as' => 'login', 'uses' => 'AccountController@getLogin']);
+    Route::get('register', ['as' => 'register', 'uses' => 'AccountController@getRegister']);
+
+    Route::group(['middleware' => 'auth'], function () {
+        Route::get('edit', ['as' => 'edit', 'uses' => 'AccountController@getEdit']);
+    });
+
+});
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+    
+Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
+ 
+    Route::get('login', ['as' => 'login', 'uses' => 'AccountController@getLogin']);
+    Route::get('register', ['as' => 'register', 'uses' => 'AccountController@getRegister']);
+ 
+    Route::group(['middleware' => 'auth'], function () {
+        Route::get('edit', ['as' => 'edit', 'uses' => 'AccountController@getEdit']);
+    });
+ 
+});
+
+If you have that code in your routes.php file, you can call those routes in Blade view files like this:
+
+<a href="{{ route('account.login') }}">Login</a>
+<a href="{{ route('account.register') }}">Register</a>
+<a href="{{ route('account.edit') }}">Edit Account</a>
+1
+2
+3
+    
+<a href="{{ route('account.login') }}">Login</a>
+<a href="{{ route('account.register') }}">Register</a>
+<a href="{{ route('account.edit') }}">Edit Account</a>
+
+By the way, have you noticed I assigned an ‘as’ => ‘account.’ parameter to the whole group? That’s a new small thing in Laravel 5.1 – you can save some bytes of code this way, don’t need to add that prefix to ‘as’ to every single route anymore. But please notice there’s a dot symbol at the end of ‘as’ – you can actually change it to whatever symbol you want, you’re not limited to the dot, it’s just the most common practice.
+
+So, getting back to Route Group nesting, in short – you can actually have a group inside of another group, adding different rules (prefix, as, middleware etc.) for each of them. Pretty useful, huh?
+
+================================================================
+
+
+ Laravel Router – a package to organize your routes
+
+One of the most common questions in Laravel world is how to organize the routes file, especially for bigger projects. Of course, you can have groups, prefixes and similar things, but today I want to present to you a package by Sebastiaan Luca – called Laravel Router.
+
+Basically, this package allows you to group your routes into different files. As the author himself says:
+“For instance admin, public, and user routes are separated into different classes instead of one long routes.php file”
+
+You can find a detailed documentation on package GitHub page 
+https://github.com/sebastiaanluca/laravel-router
+in Readme section, I will just summarize the main point – as a result, you create your “Routers” in app/Http/Routers folder, and here’s how one router file looks like:
+
+<?php
+
+namespace App\Http\Routers;
+
+use SebastiaanLuca\Router\Routers\BaseRouter;
+use SebastiaanLuca\Router\Routers\RouterInterface;
+
+class PublicRouter extends BaseRouter implements RouterInterface
+{
+
+    /**
+     * Map the routes.
+     */
+    public function map()
+    {
+        $this->router->get('/', function () {
+            return 'Congratulations!';
+        });
+    }
+
+}
+1
+2
+3
+4
+5
+ 
+<?php
+ 
+namespace App\Http\Routers;
+ 
+use SebastiaanLuca\Router\Routers\BaseRouter;
+use SebastiaanLuca\Router\Routers\RouterInterface;
+ 
+class PublicRouter extends BaseRouter implements RouterInterface
+{
+ 
+    /**
+     * Map the routes.
+     */
+    public function map()
+    {
+        $this->router->get('/', function () {
+            return 'Congratulations!';
+        });
+    }
+ 
+}
+
+Then you add all your “routers” into application’s Kernel class and that’s it. Within $this->router you can use all the same functions as in a common routes.php file.
+
+https://gist.github.com/kohenkatz/4348a9ebab7442a8867021641c7e6364
+
+========================================================================================================================
+
+
+
+CONTROLLER -- subfolders
+
+ Moving Controllers to sub-folders in a correct way
+
+If your application gets bigger, it makes sense to structure Controllers with sub-folders. But it takes a little more effort than just moving the files here and there. Let me explain the structure.
+
+For example, we want to have a sub-folder app/Http/Controllers/Admin and then inside of it we have our AdminController.php, that’s fine. What we need to do inside of the file itself:
+
+1. Correct namespace – specify the inner folder:
+namespace App\Http\Controllers\Admin;
+1
+    
+namespace App\Http\Controllers\Admin;
+
+2. Use Controller – from your inner-namespace Laravel won’t “understand” extends Controller, so you need to add this:
+use App\Http\Controllers\Controller;
+1
+    
+use App\Http\Controllers\Controller;
+
+3. Routes – specify full path
+This wouldn’t work anymore:
+Route::get('admin', 'AdminController@getHome');
+1
+    
+Route::get('admin', 'AdminController@getHome');
+
+This is the correct way:
+Route::get('admin', 'Admin\AdminController@getHome');
+1
+    
+Route::get('admin', 'Admin\AdminController@getHome');
+
+And that’s it – now you can use your controller from sub-folder.
+
+==========================================================================================================================    
+
+ How to use external classes and PHP files in Laravel Controller?
+
+Laravel is an MVC framework with its own folder structure, but sometimes we want to use something external which doesn’t follow the same structure. Let’s review two different scenarios – when we have external class and when it’s just a .php file.
+
+Let’s say we have a simple example, a PagesController.php file like this:
+
+namespace App\Http\Controllers;
+
+class PagesController extends Controller
+{
+  /**
+   * Display homepage.
+   *
+   * @return Response
+   */
+  public function getHome()
+  {
+    return view('pages.home');
+  }
+
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+    
+namespace App\Http\Controllers;
+ 
+class PagesController extends Controller
+{
+  /**
+   * Display homepage.
+   *
+   * @return Response
+   */
+  public function getHome()
+  {
+    return view('pages.home');
+  }
+ 
+}
+
+Pretty simple, right? Now, let’s say we want to have our product prices on the homepage, but they come from some kind of external class or PHP file.
+Use an external class in Controller
+
+Let’s say we have a simple class to define the prices:
+
+class PricesClass {
+  public function getPrices() {
+    return ['bronze' => 50, 'silver' => 100, 'gold' => 150];
+  }
+}
+1
+2
+3
+4
+5
+    
+class PricesClass {
+  public function getPrices() {
+    return ['bronze' => 50, 'silver' => 100, 'gold' => 150];
+  }
+}
+
+Now, where to put this class and how to use it? A couple of steps here:
+
+1. You can put a class itself anywhere you want within \App folder
+
+By default, Laravel offers you some folders there like Providers, but I personally prefer to create a separate one – like App\Libraries, App\Classes or App\Services. Or you can call it your own application – App\MyApp. This is totally your choice.
+
+So, in this example, let’s save the class as App\Classes\PricesClass.php.
+
+2. Namespace within the file
+
+Now we have to tell Laravel what is the namespace of this new file – it’s the same as the folder:
+
+<?php
+
+namespace App\Classes;
+
+class PricesClass {
+// ...
+1
+2
+3
+4
+5
+6
+    
+<?php
+ 
+namespace App\Classes;
+ 
+class PricesClass {
+// ...
+
+3. Use the class in your Controller
+
+Let’s get back to our PagesController.php – here we have to add use statement for that external class, and then we’re free to use it! Like this:
+
+namespace App\Http\Controllers;
+
+use App\Classes\PricesClass;
+
+class PagesController extends Controller
+{
+  /**
+   * Display homepage.
+   *
+   * @return Response
+   */
+  public function getHome()
+  {
+    $pricesClass = new PricesClass();
+    $prices = $pricesClass->getPrices();
+    return view('pages.home', compact('prices'));
+  }
+
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+    
+namespace App\Http\Controllers;
+ 
+use App\Classes\PricesClass;
+ 
+class PagesController extends Controller
+{
+  /**
+   * Display homepage.
+   *
+   * @return Response
+   */
+  public function getHome()
+  {
+    $pricesClass = new PricesClass();
+    $prices = $pricesClass->getPrices();
+    return view('pages.home', compact('prices'));
+  }
+ 
+}
+
+That’s it, nothing more complicated than that.
+Use an external PHP file in Controller
+
+Another case – it’s not always an OOP file that we want to use. For some cases it’s just a list of functions. Of course, we can wrap them in a class as well, but not always. So, how to use the same function, if we just have a prices.php file like this:
+
+<?php
+
+function getPrices() {
+  return ['bronze' => 50, 'silver' => 100, 'gold' => 150];
+}
+1
+2
+3
+4
+5
+    
+<?php
+ 
+function getPrices() {
+  return ['bronze' => 50, 'silver' => 100, 'gold' => 150];
+}
+
+And that’s it – no class, no namespace, nothing.
+Let’s place our function as app/functions/prices.php file. Then – we have three different ways of include it:
+
+1. Just include the class with PHP functions like include() or require() – and don’t forget app_path() function:
+
+public function getHome()
+{
+  include(app_path() . '\functions\prices.php');
+  $prices = getPrices();
+  // ...
+1
+2
+3
+4
+5
+    
+public function getHome()
+{
+  include(app_path() . '\functions\prices.php');
+  $prices = getPrices();
+  // ...
+
+Note that you still need a slash symbol before the folder functions.
+You can read more about app_path() and other Helper functions in the official documentation.
+https://laravel.com/docs/5.1/helpers
+
+
+2. In composer.json file you just add needed files in “autoload” section – in a new entry called “files”:
+(thanks for this suggestion to the commenters Joseph and Hisham)
+
+    "autoload": {
+        "classmap": [
+            "database"
+        ],
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "app/functions/prices.php"
+        ]
+    },
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+    
+    "autoload": {
+        "classmap": [
+            "database"
+        ],
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "app/functions/prices.php"
+        ]
+    },
+
+This way you don’t need to use any include() functions anywhere within your controllers – just use the functions straight away.
+
+3. Autoload the whole folder in composer.json
+(thanks to YOzaz for pointing this out in comments)
+
+Another way is just autoload the folder with that file – so you would place any similar external “helpers” in that folder, and that would be included in the future. In this case – add this folder in array or “classmap”:
+
+    "autoload": {
+        "classmap": [
+            "database",
+            "app/functions"
+        ],
+    },
+1
+2
+3
+4
+5
+6
+    
+    "autoload": {
+        "classmap": [
+            "database",
+            "app/functions"
+        ],
+    },
+
+Choose this option if you want those files to be included in a manner of “set it and forget it”.
+
+Notice: if you make these changes to composer.json file, don’t forget to run composer dump-autoload for changes to take effect.
+
+===========================================================================================================================
+
+
+
+http://laraveldaily.com/how-to-customize-error-messages-in-request-validation/
+
+
+
+ How to customize error messages in Request Validation?
+
+Laravel 5 has an awesome new function – Request Validation. It separates the logic of Validation into kind of a separate layer – Requests, which reside in the folder app/Http/Requests. After the form validation, it auto-magically shows error messages. But what if we want to customize them?
+How Request Validation works
+
+Let’s start with a reminder how this thing actually works.
+
+1. In the View we create our Form with fields – this is a really simplified example:
+
+{!! Form::open(['route' => 'users.store']) !!}
+{!! Form::text('name', old('name'), ['placeholder' => 'Name']) !!}
+{!! Form::submit('Save') !!}
+1
+2
+3
+    
+{!! Form::open(['route' => 'users.store']) !!}
+{!! Form::text('name', old('name'), ['placeholder' => 'Name']) !!}
+{!! Form::submit('Save') !!}
+
+0713_requests_01
+
+2. We create a new Request class in the folder app/Http/Requests – let’s call it CreateUserRequest.php:
+
+<?php namespace App\Http\Requests;
+
+use App\Http\Requests\Request;
+
+class CreateUserRequest extends Request {
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'name' => 'required'
+        ];
+    }
+
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+    
+<?php namespace App\Http\Requests;
+ 
+use App\Http\Requests\Request;
+ 
+class CreateUserRequest extends Request {
+ 
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+ 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'name' => 'required'
+        ];
+    }
+ 
+}
+
+The only custom line of code from empty Request class I wrote here is ‘name’ => ‘required’ – that’s the field and the rule that we need to validate.
+
+3. In the Controller method for store() we have a new parameter – the same Request class we’ve just created:
+
+public function store(CreateUserRequest $request) { ...
+1
+    
+public function store(CreateUserRequest $request) { ...
+
+4. And that’s it – Laravel takes care of the rest of the validation – if the field isn’t filled, it would redirect back to the form with $errors variable, which we need to show:
+
+@if ($errors->any())
+    <ul>{!! implode('', $errors->all('<li style="color:red">:message</li>')) !!}</ul>
+@endif
+1
+2
+3
+    
+@if ($errors->any())
+    <ul>{!! implode('', $errors->all('<li style="color:red">:message</li>')) !!}</ul>
+@endif
+
+5. The result would look something like this:
+
+0713_requests_02
+So, how to customize error messages?
+
+Now, imagine if you want to change that “The name field is required” message to your own one. Or even translate it to another language. How do you do that in Laravel?
+
+Good thing is you don’t have to change anything in your Controllers, Requests or, in fact, /app folder at all – all messages customization is already separated into resources/lang/en/validation.php file (isn’t Laravel awesome?). Or you can create your own language folder instead of /en/.
+
+Here’s how that file looks by default:
+
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines contain the default error messages used by
+    | the validator class. Some of these rules have multiple versions such
+    | as the size rules. Feel free to tweak each of these messages here.
+    |
+    */
+
+    'accepted'             => 'The :attribute must be accepted.',
+    'active_url'           => 'The :attribute is not a valid URL.',
+    'after'                => 'The :attribute must be a date after :date.',
+    'alpha'                => 'The :attribute may only contain letters.',
+    'alpha_dash'           => 'The :attribute may only contain letters, numbers, and dashes.',
+    'alpha_num'            => 'The :attribute may only contain letters and numbers.',
+    'array'                => 'The :attribute must be an array.',
+    'before'               => 'The :attribute must be a date before :date.',
+    'between'              => [
+        'numeric' => 'The :attribute must be between :min and :max.',
+        'file'    => 'The :attribute must be between :min and :max kilobytes.',
+        'string'  => 'The :attribute must be between :min and :max characters.',
+        'array'   => 'The :attribute must have between :min and :max items.',
+    ],
+    'boolean'              => 'The :attribute field must be true or false.',
+    'confirmed'            => 'The :attribute confirmation does not match.',
+    'date'                 => 'The :attribute is not a valid date.',
+    'date_format'          => 'The :attribute does not match the format :format.',
+    'different'            => 'The :attribute and :other must be different.',
+    'digits'               => 'The :attribute must be :digits digits.',
+    'digits_between'       => 'The :attribute must be between :min and :max digits.',
+    'email'                => 'The :attribute must be a valid email address.',
+    'filled'               => 'The :attribute field is required.',
+    'exists'               => 'The selected :attribute is invalid.',
+    'image'                => 'The :attribute must be an image.',
+    'in'                   => 'The selected :attribute is invalid.',
+    'integer'              => 'The :attribute must be an integer.',
+    'ip'                   => 'The :attribute must be a valid IP address.',
+    'max'                  => [
+        'numeric' => 'The :attribute may not be greater than :max.',
+        'file'    => 'The :attribute may not be greater than :max kilobytes.',
+        'string'  => 'The :attribute may not be greater than :max characters.',
+        'array'   => 'The :attribute may not have more than :max items.',
+    ],
+    'mimes'                => 'The :attribute must be a file of type: :values.',
+    'min'                  => [
+        'numeric' => 'The :attribute must be at least :min.',
+        'file'    => 'The :attribute must be at least :min kilobytes.',
+        'string'  => 'The :attribute must be at least :min characters.',
+        'array'   => 'The :attribute must have at least :min items.',
+    ],
+    'not_in'               => 'The selected :attribute is invalid.',
+    'numeric'              => 'The :attribute must be a number.',
+    'regex'                => 'The :attribute format is invalid.',
+    'required'             => 'The :attribute field is required.',
+    'required_if'          => 'The :attribute field is required when :other is :value.',
+    'required_with'        => 'The :attribute field is required when :values is present.',
+    'required_with_all'    => 'The :attribute field is required when :values is present.',
+    'required_without'     => 'The :attribute field is required when :values is not present.',
+    'required_without_all' => 'The :attribute field is required when none of :values are present.',
+    'same'                 => 'The :attribute and :other must match.',
+    'size'                 => [
+        'numeric' => 'The :attribute must be :size.',
+        'file'    => 'The :attribute must be :size kilobytes.',
+        'string'  => 'The :attribute must be :size characters.',
+        'array'   => 'The :attribute must contain :size items.',
+    ],
+    'timezone'             => 'The :attribute must be a valid zone.',
+    'unique'               => 'The :attribute has already been taken.',
+    'url'                  => 'The :attribute format is invalid.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify custom validation messages for attributes using the
+    | convention "attribute.rule" to name the lines. This makes it quick to
+    | specify a specific custom language line for a given attribute rule.
+    |
+    */
+
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Attributes
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are used to swap attribute place-holders
+    | with something more reader friendly such as E-Mail Address instead
+    | of "email". This simply helps us make messages a little cleaner.
+    |
+    */
+
+    'attributes' => [],
+
+];
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+    
+<?php
+ 
+return [
+ 
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines contain the default error messages used by
+    | the validator class. Some of these rules have multiple versions such
+    | as the size rules. Feel free to tweak each of these messages here.
+    |
+    */
+ 
+    'accepted'             => 'The :attribute must be accepted.',
+    'active_url'           => 'The :attribute is not a valid URL.',
+    'after'                => 'The :attribute must be a date after :date.',
+    'alpha'                => 'The :attribute may only contain letters.',
+    'alpha_dash'           => 'The :attribute may only contain letters, numbers, and dashes.',
+    'alpha_num'            => 'The :attribute may only contain letters and numbers.',
+    'array'                => 'The :attribute must be an array.',
+    'before'               => 'The :attribute must be a date before :date.',
+    'between'              => [
+        'numeric' => 'The :attribute must be between :min and :max.',
+        'file'    => 'The :attribute must be between :min and :max kilobytes.',
+        'string'  => 'The :attribute must be between :min and :max characters.',
+        'array'   => 'The :attribute must have between :min and :max items.',
+    ],
+    'boolean'              => 'The :attribute field must be true or false.',
+    'confirmed'            => 'The :attribute confirmation does not match.',
+    'date'                 => 'The :attribute is not a valid date.',
+    'date_format'          => 'The :attribute does not match the format :format.',
+    'different'            => 'The :attribute and :other must be different.',
+    'digits'               => 'The :attribute must be :digits digits.',
+    'digits_between'       => 'The :attribute must be between :min and :max digits.',
+    'email'                => 'The :attribute must be a valid email address.',
+    'filled'               => 'The :attribute field is required.',
+    'exists'               => 'The selected :attribute is invalid.',
+    'image'                => 'The :attribute must be an image.',
+    'in'                   => 'The selected :attribute is invalid.',
+    'integer'              => 'The :attribute must be an integer.',
+    'ip'                   => 'The :attribute must be a valid IP address.',
+    'max'                  => [
+        'numeric' => 'The :attribute may not be greater than :max.',
+        'file'    => 'The :attribute may not be greater than :max kilobytes.',
+        'string'  => 'The :attribute may not be greater than :max characters.',
+        'array'   => 'The :attribute may not have more than :max items.',
+    ],
+    'mimes'                => 'The :attribute must be a file of type: :values.',
+    'min'                  => [
+        'numeric' => 'The :attribute must be at least :min.',
+        'file'    => 'The :attribute must be at least :min kilobytes.',
+        'string'  => 'The :attribute must be at least :min characters.',
+        'array'   => 'The :attribute must have at least :min items.',
+    ],
+    'not_in'               => 'The selected :attribute is invalid.',
+    'numeric'              => 'The :attribute must be a number.',
+    'regex'                => 'The :attribute format is invalid.',
+    'required'             => 'The :attribute field is required.',
+    'required_if'          => 'The :attribute field is required when :other is :value.',
+    'required_with'        => 'The :attribute field is required when :values is present.',
+    'required_with_all'    => 'The :attribute field is required when :values is present.',
+    'required_without'     => 'The :attribute field is required when :values is not present.',
+    'required_without_all' => 'The :attribute field is required when none of :values are present.',
+    'same'                 => 'The :attribute and :other must match.',
+    'size'                 => [
+        'numeric' => 'The :attribute must be :size.',
+        'file'    => 'The :attribute must be :size kilobytes.',
+        'string'  => 'The :attribute must be :size characters.',
+        'array'   => 'The :attribute must contain :size items.',
+    ],
+    'timezone'             => 'The :attribute must be a valid zone.',
+    'unique'               => 'The :attribute has already been taken.',
+    'url'                  => 'The :attribute format is invalid.',
+ 
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify custom validation messages for attributes using the
+    | convention "attribute.rule" to name the lines. This makes it quick to
+    | specify a specific custom language line for a given attribute rule.
+    |
+    */
+ 
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
+ 
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Attributes
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are used to swap attribute place-holders
+    | with something more reader friendly such as E-Mail Address instead
+    | of "email". This simply helps us make messages a little cleaner.
+    |
+    */
+ 
+    'attributes' => [],
+ 
+];
+
+Basically, it’s multi-dimensional array of text constants, with some variable prefixed by colon sign – like :attribute, :min, :max, :size etc. So it works this way:
+
+    Laravel searches for a rule we described in our Request class – for example ‘required’
+    We found it in the main array:
+    'required' => 'The :attribute field is required.',
+    1
+        
+    'required' => 'The :attribute field is required.',
+    Laravel replaces :attribute with a field name (in our case ‘name’) and returns the result as string.
+
+Once again – results then looks like this:
+
+0713_requests_02
+
+Now, back to the main question – if you want to customize it, you have such options:
+
+Option 1. Change REQUIRED rule error text
+
+You can change that ‘required’ text ‘The :attribute field is required.’ to whatever you want, and then that new text will be applied to all fields in all forms with the rule ‘required’.
+
+// ...
+    'required' => 'Please enter your :attribute.',
+// ...
+1
+2
+3
+    
+// ...
+    'required' => 'Please enter your :attribute.',
+// ...
+
+Option 2. Specify FIELD and RULE error text
+
+See that ‘custom’ array at the bottom? You can add a field there and specify error text for the name of that field (in our case ‘name’) and for specific rule – it will be applied to all forms that have that particular field in it.
+
+// ...
+    'custom' => [
+        'name' => [
+            'required' => 'Please enter your first name',
+        ],
+    ],
+// ...
+1
+2
+3
+4
+5
+6
+7
+    
+// ...
+    'custom' => [
+        'name' => [
+            'required' => 'Please enter your first name',
+        ],
+    ],
+// ...
+
+As you can see, here you don’t have to use :attribute placeholder – cause you’re specifying exact attribute name already.
+
+So you can add your custom messages one by one here, or add only some of them, and leave all the rest as default values, it’s up to you.
+Lastly, translations into a different language
+
+I’ve briefly mentioned already that you can add your own language. It is as simple as copy-pasting the whole /resources/lang/en/ folder to your new language, for example /resources/lang/fr/. The only tricky part is how do you define which language is active? It’s set in configuration file config/app.php:
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Locale Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The application locale determines the default locale that will be used
+    | by the translation service provider. You are free to set this value
+    | to any of the locales which will be supported by the application.
+    |
+    */
+
+    'locale' => 'en',
+    // ...
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Application Locale Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The application locale determines the default locale that will be used
+    | by the translation service provider. You are free to set this value
+    | to any of the locales which will be supported by the application.
+    |
+    */
+ 
+    'locale' => 'en',
+    // ...
+
+And if you want to change your active language according to URL (for example, if you have website.com/fr/some_page) or other session variable (like a particular visitor settings), you can change it on the fly like this:
+
+app()->setLocale('fr');
+1
+    
+app()->setLocale('fr');
+
+Or this:
+
+app()->setLocale(Session::get('locale'));
+1
+    
+app()->setLocale(Session::get('locale'));
+
+You can put this code somewhere in your Middleware filters – here’s Laracasts forum discussion about this topic.
+
+
+https://laracasts.com/discuss/channels/general-discussion/where-to-setlocale-in-laravel-5-on-multilingual-multidomain-app
+
+=====================================================================================================================
+
+ Timezone settings for created_at and similar fields
+
+If you install a fresh Laravel and create your app, you may notice that all created_at and other timestamp fields in database are being saved in UTC timezone. How to change it? Easy.
+
+We go to the file config/app.php and look for this entry:
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default timezone for your application, which
+    | will be used by the PHP date and date-time functions. We have gone
+    | ahead and set this to a sensible default for you out of the box.
+    |
+    */
+
+    'timezone'        => 'UTC',
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Application Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default timezone for your application, which
+    | will be used by the PHP date and date-time functions. We have gone
+    | ahead and set this to a sensible default for you out of the box.
+    |
+    */
+ 
+    'timezone'        => 'UTC',
+
+As you can see, UTC is a default value for Laravel. So you can easily change it here to, for example, Europe/London or America/Los_Angeles – see
+
+http://php.net/manual/en/timezones.asia.php
+
+If you change this settings, unfortunately old entries won’t be changed automatically, but new ones will be saved with created_at, updated_at and similar fields in your specified timezone.
+
+Another thing to consider – if you have an international project, it does make sense to save time in UTC. Strategy is quite simple – store all timestamps in UTC, and if you need it to be shown in specific case with a different timezone (for example, for a user who lives in different country), you convert it to that particular timezone on-thy-fly with Carbon library, which is inside of Laravel already – you don’t need to add or install any packages.
+Like this:
+$user->created_at->timezone('Europe/London')->format('H:i');
+1
+    
+$user->created_at->timezone('Europe/London')->format('H:i');
+
+In general, I recommend using Carbon for dealing with date/time whenever possible, it’s an awesome library – you just have to read the docs and get used to using it properly.
+
+=============================================================================================================================
+
+
+
+
+ Pivot tables and many-to-many relationships
+
+Today I want to talk about a feature of Laravel which is really useful but can be potentially difficult to understand at first. Pivot table is an example of intermediate table with relationships between two other “main” tables.
+Real-life example of pivot tables
+
+In official documentation they show the example of User-Role relationships, where user potentially can belong to several roles, and vice versa. So to make things clearer – let’s take another real-life example: Shops and Products.
+
+Let’s say a company has a dozen of Shops all over city/country and a variety of products, and they want to store the information about which Product is sold in which Shop. It’s a perfect example of many-to-many relationship: one product can belong to several shops, and one shop can have multiple products.
+
+So here’s a potential database structure:
+shops
+– id
+– name
+
+products
+– id
+– name
+
+product_shop
+– product_id
+– shop_id
+
+The final table in the list – product_shop is called a “pivot” table, as mentioned in the topic title. Now, there are several things to mention here.
+
+    Name of the pivot table should consist of singular names of both tables, separated by undescore symbole and these names should be arranged in alphabetical order, so we have to have product_shop, not shop_product.
+    To create a pivot table we can create a simple migration with artisan make:migration or use Jeffrey Way’s package Laravel 5 Generators Extended where we have a command artisan make:migration:pivot.
+
+    https://github.com/laracasts/Laravel-5-Generators-Extended#pivot-tables
+
+
+    artisan make:migration:pivot.
+    Pivot table fields: by default, there should be only two fields – foreign key to each of the tables, in our case product_id and shop_id. You can add more fields if you want, then you need to add them to relationship assignment – we will discuss that later.
+
+Models for Many-to-Many Relationships: BelongsToMany
+
+Ok, we have DB tables and migrations, now let’s create models for them. The main part here is to assign a many-to-many relationship – it can be done from either of “main” tables models.
+
+
+So, option 1:
+app/Shop.php:
+
+class Shop extends Model
+{
+    /**
+     * The products that belong to the shop.
+     */
+    public function products()
+    {
+        return $this->belongsToMany('App\Products');
+    }
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+    
+class Shop extends Model
+{
+    /**
+     * The products that belong to the shop.
+     */
+    public function products()
+    {
+        return $this->belongsToMany('App\Products');
+    }
+}
+
+Or option 2:
+app/Product.php:
+
+class Product extends Model
+{
+    /**
+     * The shops that belong to the product.
+     */
+    public function shops()
+    {
+        return $this->belongsToMany('App\Shop');
+    }
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+    
+class Product extends Model
+{
+    /**
+     * The shops that belong to the product.
+     */
+    public function shops()
+    {
+        return $this->belongsToMany('App\Shop');
+    }
+}
+
+Actually, you can do both – it depends on how will you actuall use the relationship in other parts of the code: will you need $shop->products or more likely to query $product->shops, or both.
+
+
+
+    Now, with such declaration of relationships Laravel “assumes” that pivot table name obeys the rules and is product_shop. But, if it’s actually different (for example, it’s plural), you can provide it as a second parameter:
+
+public function products()
+{
+    return $this->belongsToMany('App\Products', 'products_shops');
+}
+1
+2
+3
+4
+    
+public function products()
+{
+    return $this->belongsToMany('App\Products', 'products_shops');
+}
+
+Moreover, you can specify the actual field names of that pivot table, if they are different than default product_id and shop_id. Then just add two more parameters – first, the current model field, and then the field of the model being joined:
+
+public function products()
+{
+    return $this->belongsToMany('App\Products', 'products_shops', 
+      'shops_id', 'products_id');
+}
+1
+2
+3
+4
+5
+    
+public function products()
+{
+    return $this->belongsToMany('App\Products', 'products_shops', 
+      'shops_id', 'products_id');
+}
+
+One of the main benefits here: you don’t need to create a separate model for ProductShop – you will be able to manage that table through pivot commands, we will discuss that right away.
+Managing Many-to-Many Relationships: attach-detach-sync
+
+So, we have tables, and we have Models ready. Now, how do we actually save the data with a help of our two Models instead of the third intermediate one? Couple of things here.
+
+For example, if we want to add another product to the current shop instance, we use relationship function and then method attach():
+
+$shop = Shop::find($shop_id);
+$shop->products()->attach($product_id);
+1
+2
+    
+$shop = Shop::find($shop_id);
+$shop->products()->attach($product_id);
+
+The result – a new row will be added to product_shop table, with $product_id and $shop_id values.
+
+Likewise, we can detach a relationship – let’s say, we want to remove a product from the shop:
+
+$shop->products()->detach($product_id);
+1
+    
+$shop->products()->detach($product_id);
+
+Or, more brutally, remove all products from a particular shop – then just call method without parameters:
+
+$shop->products()->detach();
+1
+    
+$shop->products()->detach();
+
+You can also attach and detach rows, passing array of values as parameters:
+
+$shop->products()->attach([123, 456, 789]);
+$shop->products()->detach([321, 654, 987]);
+1
+2
+    
+$shop->products()->attach([123, 456, 789]);
+$shop->products()->detach([321, 654, 987]);
+
+And another REALLY useful function, in my experience, is updating the whole pivot table. Really often example – in your admin area there are checkboxes for shops for a particular product, and on Update operation you actually have to check all shops, delete those which are not in new checkbox array, and then add/update existing ones. Pain in the neck.
+
+Not anymore – there’s a method called sync() which accept new values as parameters array, and then takes care of all that “dirty work” of syncing:
+
+$product->shops()->sync([1, 2, 3]);
+1
+    
+$product->shops()->sync([1, 2, 3]);
+
+Result – no matter what values were in product_shop table before, after this call there will be only three rows with shop_id equals 1, 2, or 3.
+Additional Columns in Pivot Tables
+
+As I mentioned above, it’s pretty likely that you would want more fields in that pivot tables. In our example it would make sense to save the amount of products, price in that particular shop and timestamps. We can add the fields through migration files, as usual, but for proper usage in relationships we have to make some additional changes to Models:
+
+public function products()
+{
+    return $this->belongsToMany('App\Products')
+        ->withPivot('products_amount', 'price')
+        ->withTimestamps();
+}
+1
+2
+3
+4
+5
+6
+    
+public function products()
+{
+    return $this->belongsToMany('App\Products')
+        ->withPivot('products_amount', 'price')
+        ->withTimestamps();
+}
+
+As you can see, we can add timestamps with a simple method withTimestamps and additional fields are added just as parameters in method withPivot.
+
+Now, what it gives us is possibility to get those values in our loops in the code. With a property called pivot:
+
+foreach ($shop->products as $product)
+{
+    echo $product->pivot->price;
+}
+1
+2
+3
+4
+    
+foreach ($shop->products as $product)
+{
+    echo $product->pivot->price;
+}
+
+Basically, ->pivot represents that intermediate pivot table, and with this we can access any of our described fields, like created_at, for example.
+
+Now, how to add those values when calling attach()? The method accept another parameter as array, so you can specify all additional fields there:
+
+$shop->products()->attach(1, ['products_amount' => 100, 'price' => 49.99]);
+1
+    
+$shop->products()->attach(1, ['products_amount' => 100, 'price' => 49.99]);
+
+Conclusion
+
+So, pivot tables and many-to-many relationships are handled quite conveniently with Eloquent, so there’s no need to create a separate model for intermediate table. Hope that helps!
+
+==================================================================================================================
+
+
+
+ Laravel and shared-hosting: working with FTP and phpMyAdmin
+
+With Laravel, we get used to command line commands like composer install or artisan migrate. But what if we have only shared-hosting from client, with only FTP access and phpMyAdmin to manage database? Laravel is still usable in this case, but there are some tricks you need to make it work.
+Uploading the project for the first time
+
+To make the project work on client’s server, you need to do these things:
+1. Upload the viles via FTP
+
+FileZillaPortable
+
+Use Filezilla or similar software
+2. Make sure your domain is pointing to /public folder
+
+plesk_panel_file_sharing_public_settings
+
+Depending on where the domain is managed – it will be some kind of Plesk, DirectAdmin or similar software on the client’s server panel.
+3. Database: export/import with phpMyAdmin
+
+import-database
+
+Export your local database into SQL file, and then just import it to the server, as is.
+4. .env file or config/database.php
+
+Edit one of these files to have correct credentials to login to the database.
+
+Ta-daaa – you have your project up and running! But that’s only first part of the story.
+Maintaning the project and uploading changes
+
+Ok, now – second phase: how to properly upload changes, without breaking anything?
+1. How to upload files
+
+This is pretty simple, right? Just upload the files that have been changed via FTP and refresh the browser.
+
+Not so fast. What if we have a lot of files in different folders and we want to minimize downtime? If you just bulk-upload 100+ files, for some seconds or even minutes the website will become unpredictable. It won’t even be down, it’s worse – its status will change depending on the file(s) uploaded at that exact moment.
+
+Imagine a situation: visitor might see old Blade template with old form, but by the time it’s filled in – new Controller might work on new set of fields.
+
+The thing is that while deploying, we have to make sure that website is totally not accessible in those important seconds. Visitors should see “under construction” or “in progress” or something.
+
+If we had command-line SSH access, it would be easy:
+php artisan down
+git pull
+php artisan up
+1
+2
+3
+    
+php artisan down
+git pull
+php artisan up
+
+And then while “down”, visitors would see this:
+
+0201_laraveldaily_down
+
+But we don’t have SSH access. So how do we “fake” artisan down command? What does it actually do?
+
+It creates an empty file called down (without extension) in storage/framework folder:
+
+0201_laraveldaily_down_file
+
+So to “fake” it, you just need to create empty file with name down, and that’s it. Whenever you’ve uploaded all the necessary files – just delete the down file.
+2. How to manage database migrations
+
+Basically, when you prepare migration, you need to run same SQL query on live server with phpMyAdmin. But how do you know what that query is? All you can see is migration code which works “by magic”.
+
+There’s a helpful option for artisan migrate command. Locally, you should run it with –pretend option. Instead of actually running the command, it would show SQL for it!
+
+0201_laraveldaily_pretend
+
+And then you copy-paste it into SQL field of server phpMyAdmin, and you’re done.
+3. Composer package updates
+
+Ok, you need a new package. Or a new version of existing package. Basically, you’ve run composer install or composer update locally, and now you need to transform it to the server.
+
+In this case, you can just upload the whole /vendor folder, and that’s it. But if your internet connection is slower, or you don’t want to upload whole tens of megabytes and thousands of files (yes, vendor folder is that heavy), you should know what is actually changed there.
+
+All you actually need to upload and overwrite is 3 things:
+
+    Folders of packages that were ACTUALLY changed – looked at their modified time locally;
+    Whole folder of /vendor/composer
+    File vendor/autoload.php
+
+And that’s it – as I said, no need to transfer full /vendor.
+
+Basically, that’s it – these are main tips to work on shared-hosting. But my ultimate advice is to avoid it in any way possible. It’s a real pain in the neck – you could easily break something or overwrite wrong file. Expensive mistakes.
+
+Talk to client upfront about server requirements, and if their argument is additional costs, then your argument should be the same: just look at how much more time it takes to deploy files to shared-hosting. Your client would be much happier if you spend this time on actually CREATING something, not deploying.
+
+
+
