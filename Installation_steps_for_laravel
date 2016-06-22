@@ -54,10 +54,6 @@ You can find the URL of the local repository by opening the command line and typ
 ------------------
 ----------------------
 
-
-
-reinstall ------------- 2.0 ------------------------->>
-
 1. installed :
 sudo apt-get update
 sudo apt-get install gdebi
@@ -407,6 +403,7 @@ laravel's ORM
 php artisan make:model
 
 
+https://github.com/emilas44/laravel-5.2-on-Ubuntu/blob/master/Install%20Laravel%205.2%20on%20Ubuntu%2016.04.txt
 
 
 http://stackoverflow.com/questions/30239194/laravel-mysql-database-connection
@@ -426,3 +423,233 @@ http://stackoverflow.com/questions/31323633/laravel-mysql-database-error-unknown
 https://docs.phpmyadmin.net/en/latest/setup.html
 https://launchpad.net/~nijel/+archive/ubuntu/phpmyadmin
 https://help.launchpad.net/Packaging/PPA
+
+----------------
+
+
+-----------------
+-----------------
+for windows laravel is in c:/wamp/www/
+-----------------
+-----------------
+table name -- test_user -> cards
+
+php artisan tinker
+DB::table('cards')->insert(['title'=>'My New Card','created_at'=> new DateTime, 'updated_at'=> new DateTime ])
+
+DB::table('cards')->get();
+
+DB::table('cards')-> where('title','My New Card')->first();
+
+DB::table('cards')-> where('title','My New Card')->delete();
+
+DB::table('cards')->get();
+
+DB::table('cards')->insert(['title'=>'My Second New Card','created_at'=> new DateTime, 'updated_at'=> new DateTime ])
+
+----
+
+create relationships with eloquent,
+eg. have a relationship between the relationship and a single comment that is posted.
+each card -> has its notes (one to many relationship) 
+
+-- later assosiate each migr/note with a individual user. for now define few of them, later rollback the migrations
+
+php artisan make:migration create_notes_table --create=notes
+-- helps create miration schema of notes
+php artisan migrate
+-- helps migrate the schema to the database
+php artisan make:model Note
+-- creates a model Note
+
+$cards =  App\Card::first();
+
+now on php tinker:
+$note = new App\Note;
+$note-> body="Note part 1 - created from tinker";
+$note-> card_id = 1;
+$note->save()
+
+App\Note::all();
+
+-- here if card is created before note is created, then, relationship can be created and used in order to enter related data.
+eg.$card->addNote($note);
+
+$cards =  App\Card::first();
+$cards ->notes;
+$cards ->notes[0];
+$cards ->notes->first();
+-- this query is similar to the query below, the major difference is that : here for a particular card, all the associated notes would be fetched and from those notes, the first note would be displayed only.
+
+$cards ->notes()->first();
+-- but in this query , for a particular card not all notes would be fetched, before fetching all the notes the very first note fetched that would be displayed and if further on any more notes are required then they would be fetched.
+
+
+
+to find out about all the database queries that havent been executed yet then in tinker type:
+DB::listen(function($query){var_dump($query->sql); });
+    where you directly dump the entire sql
+
+
+
+
+
+$card->notes 
+    would return a complete details about relationship(collection where the card_id is same.)
+    eg.App\Card {#640
+     id: 1,
+     title: "My New Card",
+     created_at: "2016-06-14 04:56:43",
+     updated_at: "2016-06-14 04:56:43",
+     notes: Illuminate\Database\Eloquent\Collection {#653
+       all: [
+         App\Note {#654
+           id: 3,
+           card_id: 1,
+           body: "Note part 1 - created from tinker",
+           created_at: "2016-06-14 06:22:59",
+           updated_at: "2016-06-14 06:22:59",
+         },
+       ],
+     },
+    }
+
+
+
+
+$card->fresh()
+    would return a fresh copy of the cars in db, which would not be associated with notes
+
+note diff:
+$card->fresh()->notes->first()
+$card->fresh()->notes()->first()
+
+
+$note = App\Note::first();
+$note -> cards
+$card = App\Card::first();
+$note = new App\Note
+$note-> body="Note part 3 other card - created from tinker";
+$card ->notes()->save($note)
+App\Note::all();
+
+
+
+ $card = App\Card::first();
+ $card ->notes()->create(['body' => 'yet other note -4 from tinker' ]);
+--- this can be used to create the object from cli. 
+Here, mass assignment issue is raise and is solved by 
+
+
+----------------------
+
+
+Route Prefixes
+
+
+
+you create form with laravel, 
+
+there you can pass the id of the card with which a particular note is suppose to be associated. 
+from this id, in the notes contoller entire objevt associated with that id can be fetched.
+
+
+
+\\\\\\\
+
+php artisan migrate:refresh; -- it removes card,notes and users from 
+it will rollback and remigrate the entire DB,
+it will delete the db. so after that you have to create db again.
+
+$table->enum(answer_to_ques,['yes','no'])-> nullable;
+
+
+for card,note,user
+
+\\\\\\
+
+$user = new App\User;
+$user -> username='sayali';
+$user ->email='sag@gmail.com'
+$user ->password= bcrypt('password');
+$user ->save();
+
+App\User::all();
+
+======================================================
+================================================================
+============================================================================
+
+understanding middleware.
+
+kernel.php--
+1. in App/Http -- web entrypoints.
+2. App/Console
+
+your application is like onion-- to get to the middle you have to through all the layers.
+Middleware is like various layers of the onion that you have to make your way through.
+
+route--- dnt need to check on evry middleware.
+basic one, all the route have to go through this page.
+
+--
+
+when the site is running in production env.
+then while maintence is going on or database has to be updated, then we do,
+php artisan down
+
+after maint. is done, do,
+php artisan up
+
+==========================
+=====================================
+
+check for user login
+
+Route::get('login',function(){
+    
+    $user = User::create([
+
+        'name'=>'Sayali';
+        'password' =>bcrypt('password');
+        'plan' => 'monthly';
+    
+    //log the userin 
+
+    Auth::login($user);
+
+    return redirect("/");
+    ])
+})
+
+
+Route::get('test',['middleware'=>'subscribed',function(){
+    
+    $this->middleware('subscribed');
+
+    return 'u cn see only if u logged in and subsc monthly ';
+
+
+}]);
+
+
+===================================================
+=============================================================================
+===================================================================================================
+============================================================================================================================
+
+
+phpmyadmin::
+
+when typed only localhost without port no returns 
+
+
+vnc server local setup / routes routing/ 
+
+
+https://laracasts.com/series/intermediate-laravel/episodes/8
+https://laracasts.com/series/intermediate-laravel
+https://laracasts.com/series/whats-new-in-laravel-5-2
+
+
+
