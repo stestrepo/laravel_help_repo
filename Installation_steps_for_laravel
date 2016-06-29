@@ -251,8 +251,10 @@ environment path should be set properly in bashrc,
 it refrence from .profilerc
 
 
+================================================ 
+Task: Verify that port 80 is open
 
-
+# netstat -tulpn | grep :80
 
 
 
@@ -572,6 +574,7 @@ $user = new App\User;
 $user -> username='sayali';
 $user ->email='sag@gmail.com'
 $user ->password= bcrypt('password');
+$user -> card_id=1
 $user ->save();
 
 App\User::all();
@@ -633,6 +636,10 @@ Route::get('test',['middleware'=>'subscribed',function(){
 }]);
 
 
+incase route file gets to big::
+http://stackoverflow.com/questions/14904333/laravel-routes-php-getting-big/16574738#16574738
+http://stackoverflow.com/questions/37300594/laravel-route-cache-on-custom-route-files?lq=1
+
 ===================================================
 =============================================================================
 ===================================================================================================
@@ -651,5 +658,32 @@ https://laracasts.com/series/intermediate-laravel/episodes/8
 https://laracasts.com/series/intermediate-laravel
 https://laracasts.com/series/whats-new-in-laravel-5-2
 
+
+
+deploy and run laravel 5.2 on apache server
+
+
+install apache web server ubuntu
+
+install apache web server on rhel6
+
+can apache web server be used as local server
+
+http://www.thesitewizard.com/apache/install-apache-2-windows.shtml
+
+how to run larvel application on apache web server
+
+https://www.howtoforge.com/tutorial/install-laravel-on-ubuntu-for-apache/
+
+http://www.techotopia.com/index.php/Configuring_an_RHEL_6_Based_Web_Server
+
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/ch-Web_Servers.html
+
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/chap-Managing_Confined_Services-The_Apache_HTTP_Server.html
+
+
+
+
+stackoverflow.com/questions/21307464/can-i-import-a-mysql-dump-to-a-laravel-migration
 
 
